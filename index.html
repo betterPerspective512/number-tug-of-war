@@ -677,81 +677,79 @@ input.shake { animation: shake .4s ease; }
 }
 #endOverlay.open { display:flex; }
 
-.end-split {
+/* single card — each client sees only their own result */
+.end-card {
     width: 100%;
-    max-width: 560px;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0;
+    max-width: 380px;
     border-radius: var(--r);
     overflow: hidden;
     border: 1px solid var(--border);
-    min-height: 340px;
     animation: fadeUp .5s ease;
-}
-
-.end-side {
-    padding: 36px 24px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 12px;
+    gap: 14px;
+    padding: 52px 32px 44px;
     position: relative;
-    overflow: hidden;
 }
-
-.end-side::before {
+.end-card::before {
     content:'';
     position:absolute; inset:0;
-    opacity:.08;
+    opacity:.10;
     pointer-events:none;
 }
-.end-side.winner-side { background: rgba(46,213,115,.07); }
-.end-side.winner-side::before { background: radial-gradient(circle at center, var(--p2) 0%, transparent 70%); }
-.end-side.loser-side  { background: rgba(255,71,87,.05); }
-.end-side.loser-side::before  { background: radial-gradient(circle at center, var(--p1) 0%, transparent 70%); }
+.end-card.winner-card { background: rgba(46,213,115,.07); border-color: rgba(46,213,115,.3); }
+.end-card.winner-card::before { background: radial-gradient(circle at 50% 30%, var(--p2) 0%, transparent 65%); }
+.end-card.loser-card  { background: rgba(255,71,87,.05);  border-color: rgba(255,71,87,.2); }
+.end-card.loser-card::before  { background: radial-gradient(circle at 50% 30%, var(--p1) 0%, transparent 65%); }
 
 .end-verdict {
     font-family: 'Bebas Neue', sans-serif;
-    font-size: clamp(1.8rem, 6vw, 2.6rem);
-    letter-spacing: .1em;
+    font-size: clamp(3rem, 12vw, 4.5rem);
+    letter-spacing: .12em;
     line-height: 1;
 }
-.end-verdict.v-win { color: var(--p2); text-shadow: 0 0 30px var(--p2-glow); animation: victoryPulse 1.5s ease infinite; }
-.end-verdict.v-lose { color: var(--p1); opacity: .8; }
-@keyframes victoryPulse { 0%,100%{text-shadow:0 0 20px var(--p2-glow)} 50%{text-shadow:0 0 50px var(--p2-glow),0 0 80px var(--p2-glow)} }
+.end-verdict.v-win { color: var(--p2); text-shadow: 0 0 40px var(--p2-glow); animation: victoryPulse 1.5s ease infinite; }
+.end-verdict.v-lose { color: var(--p1); opacity: .85; }
+@keyframes victoryPulse { 0%,100%{text-shadow:0 0 20px var(--p2-glow)} 50%{text-shadow:0 0 60px var(--p2-glow),0 0 100px var(--p2-glow)} }
 
 .end-name {
-    font-size: 1rem;
+    font-size: 1.1rem;
     font-weight: 700;
     color: var(--bright);
     text-align: center;
 }
 .end-score {
     font-family: 'Bebas Neue', sans-serif;
-    font-size: 3rem;
+    font-size: 4.5rem;
     line-height: 1;
 }
-.end-score.es-win { color: var(--p2); }
+.end-score.es-win { color: var(--p2); text-shadow: 0 0 20px var(--p2-glow); }
 .end-score.es-lose { color: var(--p1); opacity: .7; }
 .end-score-lbl {
     font-family: 'DM Mono', monospace;
-    font-size: .55rem;
-    letter-spacing: .18em;
+    font-size: .6rem;
+    letter-spacing: .22em;
     text-transform: uppercase;
     color: var(--text);
+    margin-top: -8px;
 }
 
-.end-trophy { font-size: 2.8rem; animation: float 2.5s ease-in-out infinite; }
-.end-skull  { font-size: 2.4rem; opacity: .6; }
-@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+.end-trophy { font-size: 3.5rem; animation: float 2.5s ease-in-out infinite; }
+.end-skull  { font-size: 3rem; opacity: .65; }
+@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
 
-.end-divider {
-    width: 1px;
-    background: var(--border);
-    position: relative;
+/* opp score sub-line */
+.end-opp {
+    font-family: 'DM Mono', monospace;
+    font-size: .68rem;
+    color: var(--text);
+    letter-spacing: .06em;
+    margin-top: 4px;
 }
+
+/* kept so no broken ref, empty rule */
 .end-divider::after {
     content:'VS';
     position:absolute;
@@ -987,7 +985,7 @@ input.shake { animation: shake .4s ease; }
 
 <!-- ── END OVERLAY ───────────────────────────────── -->
 <div id="endOverlay">
-    <div class="end-split" id="endSplit">
+    <div id="endCard">
         <!-- filled dynamically -->
     </div>
     <div class="end-actions">
@@ -1026,7 +1024,7 @@ const statusBars = [
 const countdownOverlay = document.getElementById('countdownOverlay');
 const countdownNum     = document.getElementById('countdownNum');
 const endOverlay       = document.getElementById('endOverlay');
-const endSplit         = document.getElementById('endSplit');
+const endCard          = document.getElementById('endCard');
 const tugArena         = document.getElementById('tugArena');
 const ropeKnot         = document.getElementById('ropeKnot');
 const reconnectBanner  = document.getElementById('reconnectBanner');
@@ -1327,37 +1325,36 @@ socket.on('tugUpdate', ({ position, scorerId }) => {
 
 socket.on('gameOver', ({ winnerId, winnerName, scores }) => {
     disableChoices();
-    const iWon = winnerId === socket.id;
+    const iWon    = winnerId === socket.id;
     const myScore = scores.find(s => s.id === socket.id)?.score ?? 0;
     const oppScore = scores.find(s => s.id !== socket.id)?.score ?? 0;
     const oppName  = scores.find(s => s.id !== socket.id)?.name ?? 'Opponent';
 
-    // Build end screen
-    const myLeft = iWon;
-    const winSide = `
-        <div class="end-side winner-side">
-            <div class="end-trophy">🏆</div>
-            <div class="end-verdict v-win">Victory</div>
-            <div class="end-name">${iWon ? myName : oppName}</div>
-            <div class="end-score es-win">${iWon ? myScore : oppScore}</div>
-            <div class="end-score-lbl">POINTS</div>
-        </div>`;
-    const loseSide = `
-        <div class="end-side loser-side">
-            <div class="end-skull">💀</div>
-            <div class="end-verdict v-lose">Defeated</div>
-            <div class="end-name">${iWon ? oppName : myName}</div>
-            <div class="end-score es-lose">${iWon ? oppScore : myScore}</div>
-            <div class="end-score-lbl">POINTS</div>
-        </div>`;
-    const divider = `<div class="end-divider"></div>`;
-
-    endSplit.innerHTML = myLeft
-        ? winSide + divider + loseSide
-        : loseSide + divider + winSide;
+    // Each client sees ONLY their own result
+    if (iWon) {
+        endCard.innerHTML = `
+            <div class="end-card winner-card">
+                <div class="end-trophy">🏆</div>
+                <div class="end-verdict v-win">Victory</div>
+                <div class="end-name">${myName}</div>
+                <div class="end-score es-win">${myScore}</div>
+                <div class="end-score-lbl">POINTS</div>
+                <div class="end-opp">${oppName} scored ${oppScore}</div>
+            </div>`;
+        launchConfetti();
+    } else {
+        endCard.innerHTML = `
+            <div class="end-card loser-card">
+                <div class="end-skull">💀</div>
+                <div class="end-verdict v-lose">Defeated</div>
+                <div class="end-name">${myName}</div>
+                <div class="end-score es-lose">${myScore}</div>
+                <div class="end-score-lbl">POINTS</div>
+                <div class="end-opp">${oppName} scored ${oppScore}</div>
+            </div>`;
+    }
 
     endOverlay.classList.add('open');
-    if (iWon) launchConfetti();
 });
 
 socket.on('playerDisconnected', ({ playerName, graceSeconds }) => {
