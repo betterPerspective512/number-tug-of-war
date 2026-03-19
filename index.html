@@ -45,7 +45,6 @@ body {
     overflow-x: hidden;
 }
 
-/* ── Background grid ──────────────────────────────── */
 body::before {
     content: '';
     position: fixed;
@@ -60,7 +59,6 @@ body::before {
 
 body > * { position: relative; z-index: 1; }
 
-/* ── Brand ────────────────────────────────────────── */
 .brand {
     text-align: center;
     margin-bottom: 24px;
@@ -83,7 +81,6 @@ body > * { position: relative; z-index: 1; }
     margin-top: 4px;
 }
 
-/* ── Card Shell ──────────────────────────────────── */
 .shell {
     background: var(--panel);
     border: 1px solid var(--border);
@@ -93,7 +90,6 @@ body > * { position: relative; z-index: 1; }
     overflow: hidden;
 }
 
-/* ── Panels ──────────────────────────────────────── */
 .panel { display: none; }
 .panel.active { display: block; animation: fadeUp .35s ease; }
 
@@ -119,7 +115,6 @@ body > * { position: relative; z-index: 1; }
     content:''; flex:1; height:1px; background:var(--border);
 }
 
-/* ── Inputs ──────────────────────────────────────── */
 .field { display:flex; flex-direction:column; gap:5px; margin-bottom:14px; }
 .field label {
     font-family: 'DM Mono', monospace;
@@ -152,7 +147,6 @@ input.shake { animation: shake .4s ease; }
     80%{transform:translateX(4px)}
 }
 
-/* ── Buttons ─────────────────────────────────────── */
 .btn {
     display:inline-flex; align-items:center; justify-content:center; gap:6px;
     padding: 12px 24px;
@@ -196,7 +190,6 @@ input.shake { animation: shake .4s ease; }
 .btn-ghost:hover:not(:disabled) { border-color: var(--gold); color: var(--gold); }
 .btn:disabled { opacity:.3; cursor:not-allowed; transform:none !important; box-shadow:none !important; }
 
-/* ── Lobby two-column ─────────────────────────────── */
 .lobby-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -221,7 +214,6 @@ input.shake { animation: shake .4s ease; }
     color: var(--text);
 }
 
-/* ── Room Badge ──────────────────────────────────── */
 .room-badge {
     background: var(--card);
     border: 1px solid var(--border2);
@@ -263,7 +255,6 @@ input.shake { animation: shake .4s ease; }
 .copy-btn:hover { background: rgba(255,211,42,.25); }
 .copy-btn.done { color: var(--text); border-color: var(--border); background: transparent; }
 
-/* ── Ready Screen ─────────────────────────────────── */
 .players-versus {
     display: grid;
     grid-template-columns: 1fr auto 1fr;
@@ -315,7 +306,6 @@ input.shake { animation: shake .4s ease; }
     letter-spacing: .1em;
 }
 
-/* ── Countdown Overlay ───────────────────────────── */
 #countdownOverlay {
     display: none;
     position: fixed;
@@ -353,10 +343,8 @@ input.shake { animation: shake .4s ease; }
     animation: fadeUp .4s ease;
 }
 
-/* ── Game Panel ──────────────────────────────────── */
 #panel-game .panel-body { padding: 0; }
 
-/* Tug Arena */
 .tug-arena {
     background: var(--card);
     border-bottom: 1px solid var(--border);
@@ -372,7 +360,6 @@ input.shake { animation: shake .4s ease; }
     pointer-events:none;
 }
 
-/* Players above rope */
 .tug-fighters {
     display: flex;
     justify-content: space-between;
@@ -381,7 +368,6 @@ input.shake { animation: shake .4s ease; }
     position: relative;
 }
 
-/* Sprite container */
 .fighter {
     display: flex;
     flex-direction: column;
@@ -404,7 +390,6 @@ input.shake { animation: shake .4s ease; }
 .fighter-name.n1 { color: var(--p1); }
 .fighter-name.n2 { color: var(--p2); }
 
-/* Stick figure SVG */
 .fighter-svg {
     width: 50px;
     height: 62px;
@@ -419,7 +404,6 @@ input.shake { animation: shake .4s ease; }
     50%      { transform: scaleX(var(--sx,1)) translateX(var(--dx,3px)); }
 }
 
-/* Score badges */
 .score-badge {
     font-family: 'Bebas Neue', sans-serif;
     font-size: 1.4rem;
@@ -429,14 +413,12 @@ input.shake { animation: shake .4s ease; }
 .score-badge.s1 { color: var(--p1); text-shadow: 0 0 10px var(--p1-glow); }
 .score-badge.s2 { color: var(--p2); text-shadow: 0 0 10px var(--p2-glow); }
 
-/* Rope track */
 .rope-track {
     position: relative;
     height: 36px;
     display: flex;
     align-items: center;
 }
-
 .rope-line {
     width: 100%;
     height: 6px;
@@ -445,8 +427,6 @@ input.shake { animation: shake .4s ease; }
     position: relative;
     box-shadow: 0 2px 8px rgba(0,0,0,0.5);
 }
-
-/* Knot (the marker that slides) */
 .rope-knot {
     position: absolute;
     top: 50%;
@@ -461,7 +441,6 @@ input.shake { animation: shake .4s ease; }
     transition: left .5s cubic-bezier(.34,1.56,.64,1);
     z-index: 2;
 }
-/* tick marks */
 .rope-ticks {
     position: absolute;
     top: 50%;
@@ -480,13 +459,11 @@ input.shake { animation: shake .4s ease; }
 }
 .tick.center { background: rgba(255,255,255,.35); height: 18px; }
 
-/* Zone flash */
 .tug-arena.p1-winning { animation: flashRed .4s ease; }
 .tug-arena.p2-winning { animation: flashGreen .4s ease; }
 @keyframes flashRed   { 0%,100%{background:var(--card)} 50%{background:rgba(255,71,87,.07)} }
 @keyframes flashGreen { 0%,100%{background:var(--card)} 50%{background:rgba(46,213,115,.07)} }
 
-/* ── Question Area ────────────────────────────────── */
 .q-area { padding: 20px 24px 24px; }
 
 .q-header {
@@ -532,7 +509,21 @@ input.shake { animation: shake .4s ease; }
 }
 .q-timer-num.urgent { color: var(--p1); }
 
-/* The question text */
+/* ── Difficulty badge ─────────────────────────────── */
+.diff-badge {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.55rem;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 4px;
+    transition: background .4s, color .4s;
+    border: 1px solid transparent;
+}
+.diff-badge.tier-0 { background: rgba(46,213,115,.1);  color: var(--p2);   border-color: rgba(46,213,115,.25); }
+.diff-badge.tier-1 { background: rgba(255,211,42,.1);  color: var(--gold); border-color: rgba(255,211,42,.25); }
+.diff-badge.tier-2 { background: rgba(255,71,87,.12);  color: var(--p1);   border-color: rgba(255,71,87,.3);   }
+
 .question-box {
     background: var(--bg);
     border: 1px solid var(--border2);
@@ -554,7 +545,6 @@ input.shake { animation: shake .4s ease; }
     text-shadow: 0 0 20px rgba(232,237,248,.15);
 }
 
-/* Choices grid */
 .choices {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -598,7 +588,6 @@ input.shake { animation: shake .4s ease; }
     animation: shake .35s ease;
 }
 .choice-btn.dimmed { opacity: .3; }
-/* key hint */
 .choice-key {
     position: absolute;
     top: 5px; left: 8px;
@@ -608,7 +597,6 @@ input.shake { animation: shake .4s ease; }
     color: var(--text);
 }
 
-/* Result flash */
 .result-flash {
     font-family: 'DM Mono', monospace;
     font-size: 0.72rem;
@@ -618,11 +606,10 @@ input.shake { animation: shake .4s ease; }
     letter-spacing: .06em;
     transition: opacity .3s;
 }
-.result-flash.win { color: var(--p2); }
-.result-flash.lose { color: var(--p1); }
+.result-flash.win     { color: var(--p2); }
+.result-flash.lose    { color: var(--p1); }
 .result-flash.timeout { color: var(--text); }
 
-/* ── Status Bar ───────────────────────────────────── */
 .status-bar {
     border-top: 1px solid var(--border);
     padding: 10px 24px;
@@ -644,7 +631,6 @@ input.shake { animation: shake .4s ease; }
 }
 @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
 
-/* ── Reconnect Banner ─────────────────────────────── */
 .reconnect-banner {
     display: none;
     background: rgba(255,211,42,.06);
@@ -661,7 +647,7 @@ input.shake { animation: shake .4s ease; }
 .reconnect-banner.visible { display:block; animation: fadeUp .3s ease; }
 .reconnect-cd { display:block; font-size:.95rem; font-weight:700; margin-top:3px; }
 
-/* ── End Screen ───────────────────────────────────── */
+/* ── End / Draw Overlay ───────────────────────────── */
 #endOverlay {
     display: none;
     position: fixed;
@@ -677,7 +663,6 @@ input.shake { animation: shake .4s ease; }
 }
 #endOverlay.open { display:flex; }
 
-/* single card — each client sees only their own result */
 .end-card {
     width: 100%;
     max-width: 380px;
@@ -703,6 +688,8 @@ input.shake { animation: shake .4s ease; }
 .end-card.winner-card::before { background: radial-gradient(circle at 50% 30%, var(--p2) 0%, transparent 65%); }
 .end-card.loser-card  { background: rgba(255,71,87,.05);  border-color: rgba(255,71,87,.2); }
 .end-card.loser-card::before  { background: radial-gradient(circle at 50% 30%, var(--p1) 0%, transparent 65%); }
+.end-card.draw-card   { background: rgba(255,211,42,.05); border-color: rgba(255,211,42,.3); }
+.end-card.draw-card::before   { background: radial-gradient(circle at 50% 30%, var(--gold) 0%, transparent 65%); }
 
 .end-verdict {
     font-family: 'Bebas Neue', sans-serif;
@@ -710,9 +697,12 @@ input.shake { animation: shake .4s ease; }
     letter-spacing: .12em;
     line-height: 1;
 }
-.end-verdict.v-win { color: var(--p2); text-shadow: 0 0 40px var(--p2-glow); animation: victoryPulse 1.5s ease infinite; }
-.end-verdict.v-lose { color: var(--p1); opacity: .85; }
-@keyframes victoryPulse { 0%,100%{text-shadow:0 0 20px var(--p2-glow)} 50%{text-shadow:0 0 60px var(--p2-glow),0 0 100px var(--p2-glow)} }
+.end-verdict.v-win  { color: var(--p2);  text-shadow: 0 0 40px var(--p2-glow);   animation: victoryPulse 1.5s ease infinite; }
+.end-verdict.v-lose { color: var(--p1);  opacity: .85; }
+.end-verdict.v-draw { color: var(--gold); text-shadow: 0 0 40px var(--gold-glow); animation: drawPulse 1.5s ease infinite; }
+
+@keyframes victoryPulse { 0%,100%{text-shadow:0 0 20px var(--p2-glow)}   50%{text-shadow:0 0 60px var(--p2-glow),0 0 100px var(--p2-glow)} }
+@keyframes drawPulse    { 0%,100%{text-shadow:0 0 20px var(--gold-glow)} 50%{text-shadow:0 0 60px var(--gold-glow),0 0 100px var(--gold-glow)} }
 
 .end-name {
     font-size: 1.1rem;
@@ -725,8 +715,9 @@ input.shake { animation: shake .4s ease; }
     font-size: 4.5rem;
     line-height: 1;
 }
-.end-score.es-win { color: var(--p2); text-shadow: 0 0 20px var(--p2-glow); }
-.end-score.es-lose { color: var(--p1); opacity: .7; }
+.end-score.es-win  { color: var(--p2);  text-shadow: 0 0 20px var(--p2-glow); }
+.end-score.es-lose { color: var(--p1);  opacity: .7; }
+.end-score.es-draw { color: var(--gold); text-shadow: 0 0 20px var(--gold-glow); }
 .end-score-lbl {
     font-family: 'DM Mono', monospace;
     font-size: .6rem;
@@ -738,29 +729,15 @@ input.shake { animation: shake .4s ease; }
 
 .end-trophy { font-size: 3.5rem; animation: float 2.5s ease-in-out infinite; }
 .end-skull  { font-size: 3rem; opacity: .65; }
+.end-draw-icon { font-size: 3rem; animation: float 2.5s ease-in-out infinite; }
 @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
 
-/* opp score sub-line */
 .end-opp {
     font-family: 'DM Mono', monospace;
     font-size: .68rem;
     color: var(--text);
     letter-spacing: .06em;
     margin-top: 4px;
-}
-
-/* kept so no broken ref, empty rule */
-.end-divider::after {
-    content:'VS';
-    position:absolute;
-    top:50%; left:50%;
-    transform:translate(-50%,-50%);
-    font-family:'Bebas Neue',sans-serif;
-    font-size:.9rem;
-    color:var(--text);
-    background:var(--bg);
-    padding:6px 4px;
-    letter-spacing:.1em;
 }
 
 .end-actions {
@@ -773,15 +750,11 @@ input.shake { animation: shake .4s ease; }
 }
 
 @media(max-width:420px){
-    .end-split { grid-template-columns:1fr; }
-    .end-divider { display:none; }
     .end-actions { flex-direction:column; }
 }
 
-/* ── Confetti canvas ─────────────────────────────── */
 #confetti { position:fixed; inset:0; pointer-events:none; z-index:290; }
 
-/* ── Scoreboard row in lobby ─────────────────────── */
 .score-row {
     display: flex;
     justify-content: space-between;
@@ -869,7 +842,7 @@ input.shake { animation: shake .4s ease; }
                 <div style="font-size:.82rem;color:var(--text2);line-height:1.7;">
                     Answer math questions faster than your opponent.<br>
                     Each correct answer pulls the rope <strong style="color:var(--bright)">toward you</strong>.<br>
-                    First to pull the rope <strong style="color:var(--bright)">5 steps</strong> wins. ⚡
+                    First to pull <strong style="color:var(--bright)">5 steps</strong> wins instantly. 15 questions total — difficulty ramps up. ⚡
                 </div>
             </div>
 
@@ -882,25 +855,18 @@ input.shake { animation: shake .4s ease; }
     <div id="panel-game" class="panel">
         <div class="panel-body">
 
-            <!-- Tug Arena -->
             <div class="tug-arena" id="tugArena">
                 <div class="tug-fighters">
                     <div class="fighter left" id="f1">
                         <div class="score-badge s1" id="score1">0</div>
-                        <!-- P1 stick figure -->
                         <svg class="fighter-svg" viewBox="0 0 50 62" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <!-- head -->
                             <circle cx="25" cy="9" r="7" fill="none" stroke="#ff4757" stroke-width="2.5"/>
-                            <!-- body -->
                             <line x1="25" y1="16" x2="25" y2="36" stroke="#ff4757" stroke-width="2.5" stroke-linecap="round"/>
-                            <!-- arms - pulling pose -->
                             <line x1="25" y1="22" x2="10" y2="29" stroke="#ff4757" stroke-width="2.5" stroke-linecap="round"/>
                             <line x1="10" y1="29" x2="5"  y2="24" stroke="#ff4757" stroke-width="2.5" stroke-linecap="round"/>
                             <line x1="25" y1="22" x2="38" y2="20" stroke="#ff4757" stroke-width="2.5" stroke-linecap="round"/>
-                            <!-- legs -->
                             <line x1="25" y1="36" x2="15" y2="52" stroke="#ff4757" stroke-width="2.5" stroke-linecap="round"/>
                             <line x1="25" y1="36" x2="33" y2="52" stroke="#ff4757" stroke-width="2.5" stroke-linecap="round"/>
-                            <!-- feet -->
                             <line x1="15" y1="52" x2="8"  y2="52" stroke="#ff4757" stroke-width="2.5" stroke-linecap="round"/>
                             <line x1="33" y1="52" x2="26" y2="52" stroke="#ff4757" stroke-width="2.5" stroke-linecap="round"/>
                         </svg>
@@ -909,7 +875,6 @@ input.shake { animation: shake .4s ease; }
 
                     <div class="fighter right" id="f2">
                         <div class="score-badge s2" id="score2">0</div>
-                        <!-- P2 stick figure (mirrored via CSS) -->
                         <svg class="fighter-svg" viewBox="0 0 50 62" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <circle cx="25" cy="9" r="7" fill="none" stroke="#2ed573" stroke-width="2.5"/>
                             <line x1="25" y1="16" x2="25" y2="36" stroke="#2ed573" stroke-width="2.5" stroke-linecap="round"/>
@@ -925,7 +890,6 @@ input.shake { animation: shake .4s ease; }
                     </div>
                 </div>
 
-                <!-- Rope -->
                 <div class="rope-track">
                     <div class="rope-line">
                         <div class="rope-ticks">
@@ -940,16 +904,17 @@ input.shake { animation: shake .4s ease; }
                 </div>
             </div>
 
-            <!-- Reconnect Banner -->
             <div class="reconnect-banner" id="reconnectBanner">
                 <span id="reconnectMsg">Opponent disconnected</span>
                 <span class="reconnect-cd" id="reconnectCd"></span>
             </div>
 
-            <!-- Question Area -->
             <div class="q-area">
                 <div class="q-header">
-                    <div class="q-counter" id="qCounter">Q 1 / 10</div>
+                    <div style="display:flex;align-items:center;gap:8px;">
+                        <div class="q-counter" id="qCounter">Q 1 / 15</div>
+                        <div class="diff-badge tier-0" id="diffBadge">Easy</div>
+                    </div>
                     <div class="q-timer-wrap">
                         <div class="q-timer-bar-bg">
                             <div class="q-timer-bar" id="timerBar"></div>
@@ -977,7 +942,6 @@ input.shake { animation: shake .4s ease; }
 
 </div><!-- /shell -->
 
-<!-- ── COUNTDOWN OVERLAY ─────────────────────────── -->
 <div id="countdownOverlay">
     <div class="countdown-num" id="countdownNum">3</div>
     <div class="countdown-label">GET READY</div>
@@ -985,9 +949,7 @@ input.shake { animation: shake .4s ease; }
 
 <!-- ── END OVERLAY ───────────────────────────────── -->
 <div id="endOverlay">
-    <div id="endCard">
-        <!-- filled dynamically -->
-    </div>
+    <div id="endCard"></div>
     <div class="end-actions">
         <button class="btn btn-gold" style="flex:1;" onclick="doPlayAgain()">Play Again</button>
         <button class="btn btn-ghost" style="flex:1;" onclick="doLeave()">Leave</button>
@@ -1000,15 +962,17 @@ input.shake { animation: shake .4s ease; }
 const socket = io();
 const SESSION = 'mathtug_session';
 
-let myId       = null;
-let myName     = null;
-let myRoomId   = null;
-let p1id       = null;
-let p2id       = null;
+let myId           = null;
+let myName         = null;
+let myRoomId       = null;
+let p1id           = null;
+let p2id           = null;
 let currentChoices = [];
-let answered   = false;
-let graceTimer = null;
-let confettiAnim = null;
+let answered       = false;
+let graceTimer     = null;
+let confettiAnim   = null;
+
+const TOTAL_Q = 15;
 
 // ── DOM Shortcuts ──────────────────────────────────
 const panels = {
@@ -1035,6 +999,7 @@ const choiceVals       = choiceButtons.map(b => b.querySelector('.choice-val'));
 const resultFlash      = document.getElementById('resultFlash');
 const timerBar         = document.getElementById('timerBar');
 const timerNum         = document.getElementById('timerNum');
+const diffBadge        = document.getElementById('diffBadge');
 
 // ── Helpers ────────────────────────────────────────
 function saveSession(d){ try{ sessionStorage.setItem(SESSION, JSON.stringify(d)); }catch(e){} }
@@ -1046,34 +1011,28 @@ function switchPanel(name) {
     if (panels[name]) panels[name].classList.add('active');
 }
 
-function setStatus(msg) {
-    statusBars.forEach(s => s.textContent = msg);
-}
+function setStatus(msg) { statusBars.forEach(s => s.textContent = msg); }
 
 function updateKnot(position) {
-    // position: -5 (full p1) to +5 (full p2), 0 center
-    // map to 5%–95% of track width
     const pct = ((position + 5) / 10) * 90 + 5;
     ropeKnot.style.left = pct + '%';
 }
 
-function disableChoices() {
-    choiceButtons.forEach(b => { b.disabled = true; });
-}
+function disableChoices() { choiceButtons.forEach(b => { b.disabled = true; }); }
 
 function enableChoices() {
-    choiceButtons.forEach(b => {
-        b.disabled = false;
-        b.className = 'choice-btn';
-    });
+    choiceButtons.forEach(b => { b.disabled = false; b.className = 'choice-btn'; });
     answered = false;
 }
 
 function resetChoiceStyles() {
-    choiceButtons.forEach(b => {
-        b.className = 'choice-btn';
-        b.disabled = false;
-    });
+    choiceButtons.forEach(b => { b.className = 'choice-btn'; b.disabled = false; });
+}
+
+function updateDiffBadge(tier) {
+    const labels = ['Easy', 'Medium', 'Hard'];
+    diffBadge.textContent = labels[tier] ?? 'Easy';
+    diffBadge.className   = `diff-badge tier-${tier}`;
 }
 
 function showReconnectBanner(msg, secs) {
@@ -1141,6 +1100,48 @@ function stopConfetti() {
     c.getContext('2d').clearRect(0,0,c.width,c.height);
 }
 
+// ── Draw confetti (gold) ───────────────────────────
+function launchDrawConfetti() {
+    const canvas = document.getElementById('confetti');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    const pieces = Array.from({length:80}, () => ({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height - canvas.height,
+        r: Math.random() * 6 + 3,
+        d: Math.random() * 80 + 20,
+        color: ['#ffd32a','#e8edf8','#c8a96e','#fff','#ffe066'][Math.floor(Math.random()*5)],
+        tilt: Math.random() * 10 - 5,
+        tiltAngle: 0,
+        tiltSpeed: Math.random() * 0.1 + 0.05,
+    }));
+    let frame = 0;
+    function draw() {
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        pieces.forEach(p => {
+            p.tiltAngle += p.tiltSpeed;
+            p.y += (Math.cos(frame/20+p.d)+2) * 1.5;
+            p.x += Math.sin(frame/20) * 0.5;
+            p.tilt = Math.sin(p.tiltAngle) * 12;
+            if (p.y > canvas.height) { p.y = -10; p.x = Math.random()*canvas.width; }
+            ctx.beginPath();
+            ctx.lineWidth = p.r;
+            ctx.strokeStyle = p.color;
+            ctx.moveTo(p.x+p.tilt+p.r/2, p.y);
+            ctx.lineTo(p.x+p.tilt, p.y+p.tilt+p.r/2);
+            ctx.stroke();
+        });
+        frame++;
+        confettiAnim = requestAnimationFrame(draw);
+    }
+    draw();
+    setTimeout(() => {
+        cancelAnimationFrame(confettiAnim);
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+    }, 3500);
+}
+
 // ── Socket ─────────────────────────────────────────
 socket.on('connect', () => {
     myId = socket.id;
@@ -1160,14 +1161,14 @@ socket.on('rejoinSuccess', ({ gameState, player1, player2, p1id: _p1, p2id: _p2,
     updateKnot(tugPosition || 0);
     hideReconnectBanner();
     setStatus('Reconnected!');
-    if (gameState === 'waiting')  { switchPanel('lobby'); clearSession(); }
-    if (gameState === 'lobby')    switchPanel('ready');
-    if (gameState === 'playing')  switchPanel('game');
+    if (gameState === 'waiting')   { switchPanel('lobby'); clearSession(); }
+    if (gameState === 'lobby')     switchPanel('ready');
+    if (gameState === 'playing')   switchPanel('game');
     if (gameState === 'game_over') switchPanel('game');
 });
 
 socket.on('updateStatus', msg => setStatus(msg));
-socket.on('errorMsg', msg => setStatus('⚠ ' + msg));
+socket.on('errorMsg',     msg => setStatus('⚠ ' + msg));
 
 socket.on('roomCreated', ({ roomId }) => {
     myRoomId = roomId;
@@ -1206,6 +1207,7 @@ socket.on('gameStateUpdate', state => {
         switchPanel('game');
         hideReconnectBanner();
         updateKnot(0);
+        updateDiffBadge(0);
         document.getElementById('score1').textContent = '0';
         document.getElementById('score2').textContent = '0';
     }
@@ -1217,6 +1219,7 @@ socket.on('clearBoard', () => {
     hideReconnectBanner();
     resultFlash.textContent = '';
     updateKnot(0);
+    updateDiffBadge(0);
     document.getElementById('score1').textContent = '0';
     document.getElementById('score2').textContent = '0';
     document.getElementById('readyBtn').disabled = false;
@@ -1234,13 +1237,10 @@ socket.on('countdown', val => {
     countdownOverlay.classList.add('open');
     countdownNum.textContent = val;
     countdownNum.className = (val === 'GO!' ? 'countdown-num go' : 'countdown-num');
-    // hide after GO
-    if (val === 'GO!') {
-        setTimeout(() => countdownOverlay.classList.remove('open'), 700);
-    }
+    if (val === 'GO!') setTimeout(() => countdownOverlay.classList.remove('open'), 700);
 });
 
-socket.on('newQuestion', ({ question, choices, index, total, timeLeft }) => {
+socket.on('newQuestion', ({ question, choices, index, total, timeLeft, tier }) => {
     currentChoices = choices;
     answered = false;
     document.getElementById('questionText').textContent = question;
@@ -1250,12 +1250,11 @@ socket.on('newQuestion', ({ question, choices, index, total, timeLeft }) => {
     resultFlash.textContent = '';
     resultFlash.className = 'result-flash';
     updateTimer(timeLeft, timeLeft);
+    updateDiffBadge(tier ?? 0);
     enableChoices();
 });
 
-socket.on('questionTimer', ({ timeLeft }) => {
-    updateTimer(timeLeft, 12);
-});
+socket.on('questionTimer', ({ timeLeft }) => { updateTimer(timeLeft, 12); });
 
 function updateTimer(t, max) {
     const pct = (t / max) * 100;
@@ -1268,7 +1267,6 @@ function updateTimer(t, max) {
 
 socket.on('questionResult', ({ correct, correctAnswer, scorerId, scorerName, message }) => {
     disableChoices();
-    // Highlight the correct answer
     choiceButtons.forEach((b, i) => {
         if (currentChoices[i] === correctAnswer) b.classList.add('correct');
         else b.classList.add('dimmed');
@@ -1279,15 +1277,14 @@ socket.on('questionResult', ({ correct, correctAnswer, scorerId, scorerName, mes
 });
 
 socket.on('wrongAnswer', ({ answer }) => {
-    // flash the wrong choice red
     choiceButtons.forEach((b, i) => {
         if (currentChoices[i] === answer) {
             b.classList.add('wrong');
             setTimeout(() => b.classList.remove('wrong'), 600);
         }
     });
-    answered = false; // allow re-try
-    disableChoices(); // will be re-enabled after shake
+    answered = false;
+    disableChoices();
     setTimeout(() => {
         if (!answered) {
             choiceButtons.forEach(b => { if (!b.classList.contains('correct')) b.disabled = false; });
@@ -1297,8 +1294,6 @@ socket.on('wrongAnswer', ({ answer }) => {
 
 socket.on('tugUpdate', ({ position, scorerId }) => {
     updateKnot(position);
-    // Update scores from position
-    // We track scores separately from server events
     if (scorerId) {
         const isP1 = scorerId === p1id;
         if (isP1) {
@@ -1306,32 +1301,38 @@ socket.on('tugUpdate', ({ position, scorerId }) => {
             s1.textContent = parseInt(s1.textContent||0) + 1;
             tugArena.className = 'tug-arena p1-winning';
             document.getElementById('f1').classList.add('strain');
-            setTimeout(() => {
-                tugArena.className = 'tug-arena';
-                document.getElementById('f1').classList.remove('strain');
-            }, 500);
+            setTimeout(() => { tugArena.className = 'tug-arena'; document.getElementById('f1').classList.remove('strain'); }, 500);
         } else {
             const s2 = document.getElementById('score2');
             s2.textContent = parseInt(s2.textContent||0) + 1;
             tugArena.className = 'tug-arena p2-winning';
             document.getElementById('f2').classList.add('strain');
-            setTimeout(() => {
-                tugArena.className = 'tug-arena';
-                document.getElementById('f2').classList.remove('strain');
-            }, 500);
+            setTimeout(() => { tugArena.className = 'tug-arena'; document.getElementById('f2').classList.remove('strain'); }, 500);
         }
     }
 });
 
-socket.on('gameOver', ({ winnerId, winnerName, scores }) => {
+socket.on('gameOver', ({ winnerId, winnerName, draw, scores }) => {
     disableChoices();
-    const iWon    = winnerId === socket.id;
-    const myScore = scores.find(s => s.id === socket.id)?.score ?? 0;
-    const oppScore = scores.find(s => s.id !== socket.id)?.score ?? 0;
-    const oppName  = scores.find(s => s.id !== socket.id)?.name ?? 'Opponent';
 
-    // Each client sees ONLY their own result
-    if (iWon) {
+    const myScore  = scores.find(s => s.id === socket.id)?.score ?? 0;
+    const oppScore = scores.find(s => s.id !== socket.id)?.score ?? 0;
+    const oppName  = scores.find(s => s.id !== socket.id)?.name  ?? 'Opponent';
+    const iWon     = winnerId === socket.id;
+
+    if (draw) {
+        // ── Draw card (same for both players) ──
+        endCard.innerHTML = `
+            <div class="end-card draw-card">
+                <div class="end-draw-icon">🤝</div>
+                <div class="end-verdict v-draw">Draw</div>
+                <div class="end-name">${myName} vs ${oppName}</div>
+                <div class="end-score es-draw">${myScore}</div>
+                <div class="end-score-lbl">EACH · ALL SQUARE</div>
+                <div class="end-opp" style="color:var(--gold);opacity:.7;">Perfectly matched minds ⚡</div>
+            </div>`;
+        launchDrawConfetti();
+    } else if (iWon) {
         endCard.innerHTML = `
             <div class="end-card winner-card">
                 <div class="end-trophy">🏆</div>
@@ -1419,13 +1420,13 @@ function copyCode() {
     });
 }
 
-// ── Keyboard shortcuts (A B C D) ──────────────────
+// ── Keyboard shortcuts ─────────────────────────────
 document.addEventListener('keydown', e => {
     const map = { 'a': 0, 'b': 1, 'c': 2, 'd': 3 };
     const idx = map[e.key.toLowerCase()];
     if (idx !== undefined && panels.game.classList.contains('active')) {
         const btn = choiceButtons[idx];
-        if (btn && !btn.disabled) { btn.click(); }
+        if (btn && !btn.disabled) btn.click();
     }
     if (e.key === 'Enter') {
         if (panels.lobby.classList.contains('active')) createRoom();

@@ -14,11 +14,12 @@ app.get('/', (req, res) => {
 });
 
 // ─── Constants ────────────────────────────────────────────────
-const GRACE_SECONDS = 30;
-const TOTAL_QUESTIONS = 10;   // questions per round
+const GRACE_SECONDS   = 30;
+const TOTAL_QUESTIONS = 15;   // questions per round (was 10)
 const ANSWER_TIMEOUT  = 12;   // seconds per question
 const TUG_STEPS       = 5;    // points to win (rope steps)
 const COUNTDOWN_FROM  = 3;
+const POOL_SIZE       = 300;  // pre-generated unique question pool size
 
 // ─── Room Store ───────────────────────────────────────────────
 const rooms = {};
@@ -29,37 +30,53 @@ function generateRoomId() {
     return crypto.randomBytes(3).toString('hex').toUpperCase();
 }
 
-// ─── Question Generator ───────────────────────────────────────
-//   Uses a seeded-style approach: for each question we pick
-//   an operation type AND difficulty tier at random, so
-//   consecutive rooms/lobbies never start with the same type.
-const OPS = ['add', 'sub', 'mul', 'div', 'pow', 'sqrt', 'mod', 'mixed'];
+// ─── Difficulty Tiers ─────────────────────────────────────────
+// Tier 0 = easy (q1-5), Tier 1 = medium (q6-10), Tier 2 = hard (q11-15)
+function tierForIndex(idx) {
+    if (idx < 5)  return 0;
+    if (idx < 10) return 1;
+    return 2;
+}
 
-function generateQuestion() {
-    const op = OPS[Math.floor(Math.random() * OPS.length)];
-    let question, answer, choices;
+const OPS_BY_TIER = [
+    ['add', 'sub'],                          // easy
+    ['add', 'sub', 'mul', 'div', 'mod'],     // medium
+    ['mul', 'div', 'pow', 'sqrt', 'mixed'],  // hard
+];
+
+// ─── Question Generator (tier-aware) ─────────────────────────
+function generateQuestion(tier = 0) {
+    const ops = OPS_BY_TIER[tier];
+    const op  = ops[Math.floor(Math.random() * ops.length)];
+    let question, answer;
 
     switch (op) {
         case 'add': {
-            const a = rnd(1, 99), b = rnd(1, 99);
+            // easy: small nums; harder tiers: bigger
+            const max = tier === 0 ? 50 : 99;
+            const a = rnd(1, max), b = rnd(1, max);
             question = `${a} + ${b}`;
             answer = a + b;
             break;
         }
         case 'sub': {
-            const a = rnd(10, 99), b = rnd(1, a);
+            const max = tier === 0 ? 50 : 99;
+            const a = rnd(10, max), b = rnd(1, a);
             question = `${a} − ${b}`;
             answer = a - b;
             break;
         }
         case 'mul': {
-            const a = rnd(2, 15), b = rnd(2, 15);
+            // medium: 2-9 × 2-9; hard: up to 15
+            const maxF = tier >= 2 ? 15 : 9;
+            const a = rnd(2, maxF), b = rnd(2, maxF);
             question = `${a} × ${b}`;
             answer = a * b;
             break;
         }
         case 'div': {
-            const b = rnd(2, 12), a = b * rnd(2, 12);
+            const maxB = tier >= 2 ? 12 : 9;
+            const b = rnd(2, maxB), a = b * rnd(2, 12);
             question = `${a} ÷ ${b}`;
             answer = a / b;
             break;
@@ -72,8 +89,7 @@ function generateQuestion() {
         }
         case 'sqrt': {
             const root = rnd(2, 12);
-            const sq = root * root;
-            question = `√${sq}`;
+            question = `√${root * root}`;
             answer = root;
             break;
         }
@@ -84,7 +100,6 @@ function generateQuestion() {
             break;
         }
         case 'mixed': {
-            // a + b * c style
             const a = rnd(1, 20), b = rnd(1, 10), c = rnd(1, 10);
             question = `${a} + ${b} × ${c}`;
             answer = a + b * c;
@@ -97,8 +112,8 @@ function generateQuestion() {
         }
     }
 
-    choices = generateChoices(answer);
-    return { question, answer, choices, op };
+    const choices = generateChoices(answer);
+    return { question, answer, choices, op, tier };
 }
 
 function rnd(min, max) {
@@ -107,9 +122,7 @@ function rnd(min, max) {
 
 function generateChoices(correct) {
     const set = new Set([correct]);
-    const offsets = [
-        ...shuffleArray([-3, -2, -1, 1, 2, 3, 4, -4, 5, -5, 7, -6])
-    ];
+    const offsets = shuffleArray([-3, -2, -1, 1, 2, 3, 4, -4, 5, -5, 7, -6]);
     let i = 0;
     while (set.size < 4) {
         const candidate = correct + offsets[i++ % offsets.length];
@@ -129,17 +142,90 @@ function shuffleArray(arr) {
     return a;
 }
 
+// ─── Question Pool ─────────────────────────────────────────────
+// Build a large pool of unique questions. "Unique" = unique question string.
+// The pool is shared across all rooms and refreshed when exhausted.
+let questionPool = [];
+let poolIndex    = 0;
+
+function buildPool() {
+    const seen = new Set();
+    const pool = [];
+    // Generate POOL_SIZE * 3 candidates and keep unique ones up to POOL_SIZE
+    let attempts = 0;
+    while (pool.length < POOL_SIZE && attempts < POOL_SIZE * 8) {
+        attempts++;
+        // distribute tiers roughly evenly in the pool
+        const tier = attempts % 3;
+        const q = generateQuestion(tier);
+        if (!seen.has(q.question)) {
+            seen.add(q.question);
+            pool.push(q);
+        }
+    }
+    return shuffleArray(pool);
+}
+
+function getPoolQuestion(tierOverride) {
+    // Lazily rebuild pool when exhausted
+    if (poolIndex >= questionPool.length) {
+        questionPool = buildPool();
+        poolIndex = 0;
+    }
+
+    if (tierOverride !== undefined) {
+        // Find the next question in pool matching the tier, or fall back to fresh generation
+        for (let i = poolIndex; i < questionPool.length; i++) {
+            if (questionPool[i].tier === tierOverride) {
+                // swap it to current position
+                [questionPool[poolIndex], questionPool[i]] = [questionPool[i], questionPool[poolIndex]];
+                return questionPool[poolIndex++];
+            }
+        }
+        // fallback: generate fresh if pool exhausted for this tier
+        return generateQuestion(tierOverride);
+    }
+
+    return questionPool[poolIndex++];
+}
+
+// Build initial pool at startup
+questionPool = buildPool();
+
+// ─── Round Question Builder ───────────────────────────────────
+// For a round of TOTAL_QUESTIONS, pull questions respecting difficulty ramp-up.
+// Uses the shared pool but marks questions used per-room via the pool index.
+function buildRoundQuestions() {
+    // Track question strings already used this round to avoid intra-round dupes
+    const usedThisRound = new Set();
+    const questions = [];
+
+    for (let i = 0; i < TOTAL_QUESTIONS; i++) {
+        const tier = tierForIndex(i);
+        let q;
+        let tries = 0;
+        do {
+            q = getPoolQuestion(tier);
+            tries++;
+        } while (usedThisRound.has(q.question) && tries < 20);
+
+        usedThisRound.add(q.question);
+        questions.push(q);
+    }
+    return questions;
+}
+
 // ─── Room Factory ─────────────────────────────────────────────
 function createRoom() {
     return {
-        players: [],          // [{id, name, score, ready}]
-        gameState: 'waiting', // waiting | lobby | countdown | playing | game_over
-        tugPosition: 0,       // -5 to +5 (negative = p1 winning, positive = p2 winning)
+        players: [],
+        gameState: 'waiting',
+        tugPosition: 0,
         currentQuestion: null,
         questionIndex: 0,
         questionTimer: null,
         timeLeft: ANSWER_TIMEOUT,
-        answeredBy: null,     // socket.id of who answered current q
+        answeredBy: null,
         questions: [],
         pausedForDisconnect: false,
     };
@@ -175,12 +261,11 @@ function startGame(roomId) {
     const room = rooms[roomId];
     if (!room) return;
 
-    // Pre-generate all questions for this round so they're consistent
-    room.questions = Array.from({ length: TOTAL_QUESTIONS }, generateQuestion);
+    room.questions    = buildRoundQuestions();
     room.questionIndex = 0;
-    room.tugPosition = 0;
+    room.tugPosition  = 0;
     room.players.forEach(p => { p.score = 0; });
-    room.gameState = 'playing';
+    room.gameState    = 'playing';
 
     io.to(roomId).emit('gameStateUpdate', 'playing');
     io.to(roomId).emit('tugUpdate', { position: 0 });
@@ -197,31 +282,32 @@ function sendNextQuestion(roomId) {
     }
 
     clearTimeout(room.questionTimer);
-    room.answeredBy = null;
-    room.timeLeft = ANSWER_TIMEOUT;
+    room.answeredBy      = null;
+    room.timeLeft        = ANSWER_TIMEOUT;
     room.currentQuestion = room.questions[room.questionIndex];
+
+    const tier = room.currentQuestion.tier ?? 0;
 
     io.to(roomId).emit('newQuestion', {
         question: room.currentQuestion.question,
-        choices: room.currentQuestion.choices,
-        index: room.questionIndex,
-        total: TOTAL_QUESTIONS,
-        timeLeft: ANSWER_TIMEOUT
+        choices:  room.currentQuestion.choices,
+        index:    room.questionIndex,
+        total:    TOTAL_QUESTIONS,
+        timeLeft: ANSWER_TIMEOUT,
+        tier,
     });
 
-    // Tick timer
     const tick = () => {
         if (!rooms[roomId] || room.answeredBy !== null) return;
         room.timeLeft--;
         io.to(roomId).emit('questionTimer', { timeLeft: room.timeLeft });
 
         if (room.timeLeft <= 0) {
-            // Time out — emit miss, move to next
             io.to(roomId).emit('questionResult', {
-                correct: false,
+                correct:       false,
                 correctAnswer: room.currentQuestion.answer,
-                scorerId: null,
-                message: '⌛ Time\'s up! No one scored.'
+                scorerId:      null,
+                message:       "⌛ Time's up! No one scored.",
             });
             room.questionIndex++;
             setTimeout(() => sendNextQuestion(roomId), 1800);
@@ -244,15 +330,16 @@ function endGame(roomId, forcedWinnerId) {
     } else {
         const [p1, p2] = room.players;
         if (!p1 || !p2) return;
-        if (p1.score > p2.score) winner = p1;
+        if (p1.score > p2.score)      winner = p1;
         else if (p2.score > p1.score) winner = p2;
-        // else draw
+        // else draw — winner stays null
     }
 
     io.to(roomId).emit('gameOver', {
-        winnerId: winner ? winner.id : null,
+        winnerId:   winner ? winner.id   : null,
         winnerName: winner ? winner.name : null,
-        scores: room.players.map(p => ({ id: p.id, name: p.name, score: p.score }))
+        draw:       winner === null,
+        scores:     room.players.map(p => ({ id: p.id, name: p.name, score: p.score })),
     });
 }
 
@@ -283,9 +370,9 @@ io.on('connection', (socket) => {
         if (!name?.trim()) { socket.emit('errorMsg', 'Enter a valid name.'); return; }
 
         const clean = roomId?.trim().toUpperCase();
-        const room = rooms[clean];
-        if (!room) { socket.emit('errorMsg', `Room "${clean}" not found.`); return; }
-        if (room.players.length >= 2) { socket.emit('errorMsg', 'Room is full!'); return; }
+        const room  = rooms[clean];
+        if (!room)                     { socket.emit('errorMsg', `Room "${clean}" not found.`); return; }
+        if (room.players.length >= 2)  { socket.emit('errorMsg', 'Room is full!'); return; }
         if (room.gameState !== 'waiting') { socket.emit('errorMsg', 'Game already started.'); return; }
 
         room.players.push({ id: socket.id, name: name.trim(), score: 0, ready: false });
@@ -297,8 +384,8 @@ io.on('connection', (socket) => {
         io.to(clean).emit('playersInfo', {
             player1: room.players[0].name,
             player2: room.players[1].name,
-            p1id: room.players[0].id,
-            p2id: room.players[1].id,
+            p1id:    room.players[0].id,
+            p2id:    room.players[1].id,
         });
         io.to(clean).emit('updateStatus', 'Both players in! Hit Ready when set.');
         console.log(`${name} joined room ${clean}`);
@@ -317,15 +404,13 @@ io.on('connection', (socket) => {
             p2ready: room.players[1]?.ready || false,
         });
 
-        if (bothReady(room)) {
-            startCountdown(socket.roomId);
-        }
+        if (bothReady(room)) startCountdown(socket.roomId);
     });
 
     // ── Answer ───────────────────────────────────────
     socket.on('submitAnswer', (answer) => {
         const roomId = socket.roomId;
-        const room = rooms[roomId];
+        const room   = rooms[roomId];
         if (!room || room.gameState !== 'playing' || room.answeredBy !== null) return;
 
         const player = room.players.find(p => p.id === socket.id);
@@ -338,24 +423,22 @@ io.on('connection', (socket) => {
             clearTimeout(room.questionTimer);
 
             player.score++;
-            // Move tug: p1 correct => position--, p2 correct => position++
             const pIdx = room.players.indexOf(player);
             room.tugPosition += (pIdx === 0 ? -1 : 1);
 
             io.to(roomId).emit('questionResult', {
-                correct: true,
+                correct:       true,
                 correctAnswer: room.currentQuestion.answer,
-                scorerId: socket.id,
-                scorerName: player.name,
-                message: `✓ ${player.name} got it!`
+                scorerId:      socket.id,
+                scorerName:    player.name,
+                message:       `✓ ${player.name} got it!`,
             });
 
             io.to(roomId).emit('tugUpdate', {
                 position: room.tugPosition,
-                scorerId: socket.id
+                scorerId: socket.id,
             });
 
-            // Check tug-win condition
             if (Math.abs(room.tugPosition) >= TUG_STEPS) {
                 setTimeout(() => endGame(roomId, socket.id), 1200);
                 return;
@@ -364,7 +447,6 @@ io.on('connection', (socket) => {
             room.questionIndex++;
             setTimeout(() => sendNextQuestion(roomId), 1600);
         } else {
-            // Wrong — only tell the sender
             socket.emit('wrongAnswer', { answer });
         }
     });
@@ -374,10 +456,10 @@ io.on('connection', (socket) => {
         const room = rooms[socket.roomId];
         if (!room || room.gameState !== 'game_over') return;
 
-        room.gameState = 'lobby';
-        room.tugPosition = 0;
+        room.gameState     = 'lobby';
+        room.tugPosition   = 0;
         room.questionIndex = 0;
-        room.questions = [];
+        room.questions     = [];
         room.players.forEach(p => { p.score = 0; p.ready = false; });
 
         io.to(socket.roomId).emit('clearBoard');
@@ -394,23 +476,22 @@ io.on('connection', (socket) => {
         const player = room.players.find(p => p.name === playerName);
         if (!player) { socket.emit('errorMsg', 'Your slot is gone.'); return; }
 
-        // Cancel grace
         const grace = gracePending[player.id];
         if (grace) { clearTimeout(grace.graceTimer); delete gracePending[player.id]; }
 
         const oldId = player.id;
-        player.id = socket.id;
+        player.id   = socket.id;
         socket.roomId = roomId;
         socket.join(roomId);
 
         console.log(`${playerName} rejoined ${roomId} (${oldId} → ${socket.id})`);
 
         socket.emit('rejoinSuccess', {
-            gameState: room.gameState,
-            player1: room.players[0]?.name,
-            player2: room.players[1]?.name,
-            p1id: room.players[0]?.id,
-            p2id: room.players[1]?.id,
+            gameState:   room.gameState,
+            player1:     room.players[0]?.name,
+            player2:     room.players[1]?.name,
+            p1id:        room.players[0]?.id,
+            p2id:        room.players[1]?.id,
             tugPosition: room.tugPosition,
         });
 
@@ -428,7 +509,7 @@ io.on('connection', (socket) => {
         const roomId = socket.roomId;
         if (!roomId || !rooms[roomId]) return;
 
-        const room = rooms[roomId];
+        const room   = rooms[roomId];
         const player = room.players.find(p => p.id === socket.id);
         if (!player) return;
 
@@ -452,13 +533,13 @@ io.on('connection', (socket) => {
                     if (room.players.length === 0) {
                         delete rooms[roomId];
                     } else {
-                        room.gameState = 'waiting';
+                        room.gameState           = 'waiting';
                         room.pausedForDisconnect = false;
                         io.to(roomId).emit('clearBoard');
                         io.to(roomId).emit('gameStateUpdate', 'waiting');
                         io.to(roomId).emit('updateStatus', `${player.name} left. Waiting for new player…`);
                     }
-                }, GRACE_SECONDS * 1000)
+                }, GRACE_SECONDS * 1000),
             };
         } else {
             room.players = room.players.filter(p => p.id !== socket.id);
